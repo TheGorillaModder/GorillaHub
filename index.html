@@ -186,7 +186,7 @@
             servers.push({serverip: _serverip, players: _players, region: _region});
         }
         async function uploadServer(ip, players, region) {
-            const url = 'https://gorillahub1.firebaseio.com/servers.json';
+            const url = 'https://gorillahub1.firebaseio.com/server/servers.json';
             const newServer = {
                 serverip: ip,
                 players: players,
@@ -254,7 +254,7 @@
             }
             if (serversOnline) {
                 updateLoader(15, "Fetching Server List...");
-                await fetch('https://gorillahub1.firebaseio.com/servers.json')
+                await fetch('https://gorillahub1.firebaseio.com/server/servers.json')
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(server => {
