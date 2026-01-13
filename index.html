@@ -150,20 +150,66 @@
         <div id="servers" class="content-section">
             <h2>MULTIPLAYER LOBBY</h2>
             <p style="font-size: 0.8em; margin-bottom: 20px;">C++ Game Server Status: <span style="color: lime; text-shadow: 0 0 10px lime;">ONLINE</span></p>
-            <div class="button-grid" style="grid-template-columns: 1fr; max-width: 500px; margin: 0 auto;">
-                <button class="game-btn" style="border-color: lime;">
-                    <div class="game-name" style="font-size: 1.2em;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
-                            <span style="text-align: left; padding-left: 15px; color: gray;">SERVER IP:</span>
-                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">127.0.0.1</span>
-                        </div>
-                    </div>
-                </button>
+            <div id="serversGrid" class="button-grid" style="grid-template-columns: 1fr; max-width: 500px; margin: 0 auto;">
+                
             </div>
         </div>
     </div>
 
     <script src="Sources/2Pages/gameSections.js"></script>
+    <script>
+        const serversGrid = document.getElementById("serversGrid");
+        let serversOnline = false;
+        let servers = [];
+        function updateServerList() {
+            for (let i = 0; i < servers.length; i++) {
+                serversGrid.innerHTML += `
+                <button class="game-btn" style="border-color: lime;">
+                    <div class="game-name" style="font-size: 1.2em;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray;">SERVER IP:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].serverip}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray;">PLAYERS:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].players}/10</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray;">REGION:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].region}</span>
+                        </div>
+                    </div>
+                </button>`;
+            }
+        }
+        function addServer(_serverip, _players, _region) {
+            servers.push({serverip: _serverip, players: _players, region: _region});
+        }
+        async function uploadServer(ip, players, region) {
+            const url = 'https://gorillahub1.firebaseio.com/servers.json';
+            const newServer = {
+                serverip: ip,
+                players: players,
+                region: region
+            };
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(newServer),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    console.log("Server uploaded successfully");
+                }
+            } catch (error) {
+                console.error("Upload failed:", error);
+            }
+            addServer(ip, players, region);
+        }
+        uploadServer("1.213.12.31", 5, "US East");
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
@@ -199,9 +245,29 @@
                 if (window.firebaseReady) {
                     await window.firebaseReady;
                     await new Promise(r => setTimeout(r, 500));
+                    serversOnline = true;
                 }
             } catch (e) {
                 updateLoader(10, "Connection Error: Local Mode");
+                await new Promise(r => setTimeout(r, 1000));
+                serversOnline = false;
+            }
+            if (serversOnline) {
+                updateLoader(15, "Fetching Server List...");
+                await fetch('https://gorillahub1.firebaseio.com/servers.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(server => {
+                            addServer(server.serverip, server.players, server.region);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching server data:', error);
+                    });
+                updateServerList();
+                await new Promise(r => setTimeout(r, 500));
+            } else {
+                updateLoader(15, "Offline Mode: Skipping Servers");
                 await new Promise(r => setTimeout(r, 1000));
             }
             updateLoader(30, "Loading Neural Fonts...");
@@ -270,6 +336,7 @@
                 if (tabId === 'servers') {
                     bg.style.backgroundImage = "url('Sources/3Images/background.jpg')";
                     bg.style.backgroundSize = "cover";
+                    bg.style.position = "fixed";
                     bg.style.animation = "none";
                 } else {
                     bg.style.backgroundImage = "radial-gradient(circle, rgba(255,0,0,0.15) 20%, transparent 10%)";
