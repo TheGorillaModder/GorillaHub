@@ -1,0 +1,48 @@
+<head>
+    <title>TheGorillaModder's Unblocked Games | Game Websites</title>
+    <style>
+        body {
+            background-color: black;
+            align-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px;
+            box-shadow: 0 0 25px blue;
+            background-color: blue;
+            color: white;
+            text-shadow: 0 0 25px white;
+            border-radius: 15px;
+        }
+        h1 {
+            text-shadow: 0 0 25px white;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Games Pages (All Pages Blocked/Unblocked)</h1>
+    <script>
+        function createButton(link, name = "") {
+            if (name === "") {
+                name = link;
+            }
+            let button = document.createElement("button");
+            button.onclick = function() {
+                window.open('https://' + link);
+            }
+            button.textContent = name;
+            document.body.appendChild(button);
+        }
+        createButton('unblocked-games.org');
+        createButton('geometry-lessons.top');
+        createButton('lessons1.world');
+        createButton('lessons1.lol');
+        createButton('classroom-10x.org');
+        createButton('sites.google.com/view/unblocked-games-76-new/home', "Unblocked Games 76");
+        createButton('sites.google.com/view/drive-u-7-home/', "Unblocked Games G+");
+        createButton('sites.google.com/site/unblockedgames77/home', "Unblocked Games 77");
+    </script>
+</body>
