@@ -252,23 +252,26 @@
                 await new Promise(r => setTimeout(r, 1000));
                 serversOnline = false;
             }
-            if (serversOnline) {
-                updateLoader(15, "Fetching Server List...");
-                await fetch('https://gorillahub1.firebaseio.com/server/servers.json')
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(server => {
-                            addServer(server.serverip, server.players, server.region);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching server data:', error);
-                    });
-                updateServerList();
-                await new Promise(r => setTimeout(r, 500));
-            } else {
-                updateLoader(15, "Offline Mode: Skipping Servers");
-                await new Promise(r => setTimeout(r, 1000));
+            if (window.firebaseReady) {
+                updateLoader(15, "Connecting to Cloud...");
+                try {
+                    const response = await fetch('https://gorillahub1-default-rtdb.firebaseio.com/servers.json');
+                    const data = await response.json();
+            
+                    if (data) {
+                        const servers = Object.values(data);
+                        for (let i = 0; i < servers.length; i++) {
+                            const s = servers[i];
+                            updateLoader(15, `Syncing Server: ${s.region}`);
+                            addServer(s.serverip, s.players, s.region);
+                            updateServerList();
+                            await new Promise(r => setTimeout(r, 150));
+                        }
+                    }
+                } catch (error) {
+                    updateLoader(15, "Database Error: Using Cache");
+                    await new Promise(r => setTimeout(r, 1000));
+                }
             }
             updateLoader(30, "Loading Neural Fonts...");
             await document.fonts.ready;
