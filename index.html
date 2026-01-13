@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <link rel="preload" as="image" href="Sources/.3Images/background.jpg">
+    <link rel="preload" as="image" href="Sources/3Images/background.jpg">
     
     <style>
         :root {
@@ -127,7 +127,7 @@
 <body>
 
     <input type="text" id="search-bar" placeholder="SEARCH SYSTEM...">
-    <iframe id="loader" class="loader" src="Sources/.1Loading/loader.html"></iframe>
+    <iframe id="loader" class="loader" src="Sources/1Loading/loader.html"></iframe>
     <div id="backg" class="background-animated"></div>
 
     <div id="panel" class="panel">
@@ -142,7 +142,7 @@
 
         <div id="games" class="content-section active">
             <div id="game-sections"></div>
-            <button class="game-btn" style="width: 200px; margin: 20px auto;" onclick="openGame('Sources/.2Pages/beta.html')">
+            <button class="game-btn" style="width: 200px; margin: 20px auto;" onclick="openGame('Sources/2Pages/beta.html')">
                 <div class="game-name">In Testing</div>
             </button>
         </div>
@@ -163,7 +163,7 @@
         </div>
     </div>
 
-    <script src="Sources/.2Pages/gameSections.js"></script>
+    <script src="Sources/2Pages/gameSections.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
@@ -222,11 +222,11 @@
                 await new Promise(r => setTimeout(r, 15));
             }
 
-            const images = ['Sources/.3Images/background.jpg'];
+            const images = ['Sources/3Images/background.jpg'];
             if (typeof gameSections !== 'undefined') {
                 gameSections.forEach(section => {
                     section.games.forEach(game => {
-                        images.push(`Sources/.3Images/${game.name}.jpg`);
+                        images.push(`Sources/3Images/${game.name}.jpg`);
                     });
                 });
             }
@@ -268,7 +268,7 @@
             bg.style.opacity = "0";
             setTimeout(() => {
                 if (tabId === 'servers') {
-                    bg.style.backgroundImage = "url('Sources/.3Images/background.jpg')";
+                    bg.style.backgroundImage = "url('Sources/3Images/background.jpg')";
                     bg.style.backgroundSize = "cover";
                     bg.style.animation = "none";
                 } else {
@@ -298,7 +298,7 @@
                         const sectionDiv = document.createElement('div');
                         sectionDiv.innerHTML = `<h2>${section.title}</h2><div class="button-grid">${filteredGames.map(game => `
                             <button class="game-btn" onclick="openGame('${game.link}')">
-                                <img src="Sources/.3Images/${game.name}.jpg" class="game-img" onerror="this.src='https://via.placeholder.com/200x120/000000/660000?text=${game.name.replace(/ /g, '+')}';">
+                                <img src="Sources/3Images/${game.name}.jpg" class="game-img" onerror="this.src='https://via.placeholder.com/200x120/000000/660000?text=${game.name.replace(/ /g, '+')}';">
                                 <div class="game-name">${game.name}</div>
                             </button>`).join('')}</div><div class="divider"></div>`;
                         container.appendChild(sectionDiv);
