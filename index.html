@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Drive - Google Drive</title>
+    <link rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="preload" as="image" href="Sources/.3Images/background.jpg">
+    
+    <style>
+        :root {
+            --glow-red: #ff0000;
+            --dark-red: #660000;
+            --panel-bg: rgba(0, 0, 0, 0.9);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: black;
+            color: gray;
+            font-family: "Orbitron", sans-serif;
+            overflow-x: hidden;
+        }
+
+        .background-animated {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,0,0,0.15) 20%, transparent 10%) center/20px 20px;
+            animation: backgroundMove 4s linear infinite;
+            z-index: -1;
+            transition: opacity 0.4s ease-in-out;
+            opacity: 1; 
+        }
+
+        @keyframes backgroundMove {
+            from { background-position: 0 0; }
+            to { background-position: 40px 40px; }
+        }
+
+        .panel {
+            display: none;
+            margin: 40px auto;
+            width: 85vw;
+            max-width: 1100px;
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px var(--glow-red);
+            text-align: center;
+            border: 1px solid #333;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-tabs { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+
+        .tab-btn {
+            background: none; border: 1px solid #444; color: white;
+            padding: 10px 25px; cursor: pointer; font-family: "Orbitron";
+            border-radius: 5px; transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--dark-red);
+            box-shadow: 0 0 15px var(--glow-red);
+            border-color: var(--glow-red);
+        }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px; margin-top: 20px;
+        }
+
+        .game-btn {
+            background-color: #0a0a0a; color: white; border: 1px solid var(--dark-red);
+            padding: 0; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.7); font-family: "Orbitron";
+            font-size: 0.75em; text-transform: uppercase; overflow: hidden;
+            display: flex; flex-direction: column; width: 100%;
+        }
+
+        .game-img {
+            width: 100%; height: 120px; object-fit: cover;
+            border-bottom: 2px solid var(--dark-red); transition: transform 0.5s;
+        }
+
+        .game-name {
+            padding: 12px 5px; text-shadow: 0 0 10px white;
+            background: linear-gradient(to bottom, #111, #000);
+        }
+
+        .game-btn:hover {
+            background-color: var(--dark-red); transform: translateY(-5px);
+            box-shadow: 0 0 25px var(--glow-red); border-color: var(--glow-red);
+        }
+
+        .game-btn:hover .game-img { transform: scale(1.1); }
+
+        #search-bar {
+            display: none; position: fixed; top: 20px; right: 20px;
+            padding: 10px 15px; background: #000; color: white;
+            border: 1px solid var(--glow-red); border-radius: 10px;
+            width: 200px; font-family: "Orbitron"; z-index: 100;
+            box-shadow: 0 0 15px var(--dark-red);
+        }
+
+        h1 { color: #fff; font-size: 1.8em; margin-bottom: 10px; text-shadow: 0 0 20px white; }
+        h2 { font-size: 1.1em; text-align: left; margin: 20px 0 10px 10px; color: #bbb; }
+        .divider { height: 2px; background: gray; margin: 25px 0; box-shadow: 0 0 15px gray; }
+        .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; border: none; }
+        
+        .tip-box {
+            font-size: 0.7em; color: #555; margin-top: 30px;
+            padding: 15px; border-top: 1px solid #222;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="search-bar" placeholder="SEARCH SYSTEM...">
+    <iframe id="loader" class="loader" src="Sources/.1Loading/loader.html"></iframe>
+    <div id="backg" class="background-animated"></div>
+
+    <div id="panel" class="panel">
+        <h1 id="titleText">GORILLA HUB BETA</h1>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab(event, 'games')">GAMES</button>
+            <button class="tab-btn" onclick="showTab(event, 'servers')">SERVERS</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="games" class="content-section active">
+            <div id="game-sections"></div>
+            <button class="game-btn" style="width: 200px; margin: 20px auto;" onclick="openGame('Sources/.2Pages/beta.html')">
+                <div class="game-name">In Testing</div>
+            </button>
+        </div>
+
+        <div id="servers" class="content-section">
+            <h2>MULTIPLAYER LOBBY</h2>
+            <p style="font-size: 0.8em; margin-bottom: 20px;">C++ Game Server Status: <span style="color: lime; text-shadow: 0 0 10px lime;">ONLINE</span></p>
+            <div class="button-grid" style="grid-template-columns: 1fr; max-width: 500px; margin: 0 auto;">
+                <button class="game-btn" style="border-color: lime;">
+                    <div class="game-name" style="font-size: 1.2em;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray;">SERVER IP:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">127.0.0.1</span>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Sources/.2Pages/gameSections.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyByhL4UGGUrrNOne38Dm0WyP4nEJ6aseew",
+            authDomain: "gorillahub1.firebaseapp.com",
+            projectId: "gorillahub1",
+            storageBucket: "gorillahub1.firebasestorage.app",
+            messagingSenderId: "262366783834",
+            appId: "1:262366783834:web:158d6159c098b9683d2b63",
+            measurementId: "G-MBR4W2BPXB"
+        };
+        window.firebaseReady = new Promise((resolve) => {
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            resolve(app);
+        });
+    </script>
+    <script>
+        const loaderFrame = document.getElementById('loader');
+
+        function updateLoader(pct, msg) {
+            loaderFrame.contentWindow.postMessage({
+                percent: pct,
+                message: msg
+            }, "*"); 
+        }
+
+        async function startRealLoad() {
+            await new Promise(r => setTimeout(r, 500));
+            updateLoader(10, "Initializing Core...");
+            try {
+                if (window.firebaseReady) {
+                    await window.firebaseReady;
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            } catch (e) {
+                updateLoader(10, "Connection Error: Local Mode");
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            updateLoader(30, "Loading Neural Fonts...");
+            await document.fonts.ready;
+            
+            let allGames = [];
+            if (typeof gameSections !== 'undefined') {
+                gameSections.forEach(section => {
+                    section.games.forEach(game => {
+                        allGames.push(game.name);
+                    });
+                });
+            }
+            for (let i = 0; i < allGames.length; i++) {
+                let compileProgress = Math.floor(30 + ((i / allGames.length) * 20));
+                updateLoader(compileProgress, `Compiling: ${i + 1}/${allGames.length}`);
+                if (i === allGames.length - 1) generateSections();
+                await new Promise(r => setTimeout(r, 15));
+            }
+
+            const images = ['Sources/.3Images/background.jpg'];
+            if (typeof gameSections !== 'undefined') {
+                gameSections.forEach(section => {
+                    section.games.forEach(game => {
+                        images.push(`Sources/.3Images/${game.name}.jpg`);
+                    });
+                });
+            }
+            for (let i = 0; i < images.length; i++) {
+                const src = images[i];
+                const fileName = src.split('/').pop(); 
+                let progress = Math.floor(50 + ((i / images.length) * 45));
+                updateLoader(progress, `Preloading: ${i + 1}/${images.length}`);
+                await new Promise(res => {
+                    const img = new Image();
+                    img.src = src;
+                    img.onload = res;
+                    img.onerror = res;
+                });
+                await new Promise(r => setTimeout(r, 15));
+            }
+            updateLoader(100, "Loading Finished");
+            setTimeout(() => {
+                document.getElementById("loader").style.opacity = '0';
+                document.getElementById("loader").style.display = 'none';
+                document.getElementById("panel").style.display = 'block';
+                document.getElementById("backg").style.display = 'block';
+                document.getElementById("search-bar").style.display = 'block';
+                document.title = 'Home - Google Drive';
+            }, 500);
+        }
+
+        window.onload = function () {
+            document.getElementById('search-bar').addEventListener('input', (e) => generateSections(e.target.value));
+            startRealLoad();
+        };
+
+        function showTab(event, tabId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            const bg = document.getElementById("backg");
+            bg.style.opacity = "0";
+            setTimeout(() => {
+                if (tabId === 'servers') {
+                    bg.style.backgroundImage = "url('Sources/.3Images/background.jpg')";
+                    bg.style.backgroundSize = "cover";
+                    bg.style.animation = "none";
+                } else {
+                    bg.style.backgroundImage = "radial-gradient(circle, rgba(255,0,0,0.15) 20%, transparent 10%)";
+                    bg.style.backgroundSize = "20px 20px";
+                    bg.style.animation = "backgroundMove 4s linear infinite";
+                }
+                bg.style.opacity = "1";
+            }, 400);
+        }
+
+        function openGame(link) {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`<html><head><title>My Drive - Google Drive</title><link rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png"><style>html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: black; } iframe { border: none; width: 100vw; height: 100vh; }</style></head><body><iframe src="${link}" frameborder="0" allowfullscreen></iframe></body></html>`);
+            newWindow.document.close();
+        }
+
+        function generateSections(searchTerm = '') {
+            const container = document.getElementById('game-sections');
+            container.innerHTML = '';
+            let totalFound = 0;
+            if (typeof gameSections !== 'undefined') {
+                gameSections.forEach(section => {
+                    const filteredGames = section.games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+                    totalFound += filteredGames.length;
+                    if (filteredGames.length > 0) {
+                        const sectionDiv = document.createElement('div');
+                        sectionDiv.innerHTML = `<h2>${section.title}</h2><div class="button-grid">${filteredGames.map(game => `
+                            <button class="game-btn" onclick="openGame('${game.link}')">
+                                <img src="Sources/.3Images/${game.name}.jpg" class="game-img" onerror="this.src='https://via.placeholder.com/200x120/000000/660000?text=${game.name.replace(/ /g, '+')}';">
+                                <div class="game-name">${game.name}</div>
+                            </button>`).join('')}</div><div class="divider"></div>`;
+                        container.appendChild(sectionDiv);
+                    }
+                });
+            }
+            document.getElementById('titleText').textContent = `GORILLA HUB BETA (${totalFound} Games)`;
+        }
+    </script>
+</body>
+</html>
