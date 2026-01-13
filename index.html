@@ -117,11 +117,6 @@
         h2 { font-size: 1.1em; text-align: left; margin: 20px 0 10px 10px; color: #bbb; }
         .divider { height: 2px; background: gray; margin: 25px 0; box-shadow: 0 0 15px gray; }
         .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; border: none; }
-        
-        .tip-box {
-            font-size: 0.7em; color: #555; margin-top: 30px;
-            padding: 15px; border-top: 1px solid #222;
-        }
     </style>
 </head>
 <body>
@@ -157,62 +152,55 @@
     </div>
 
     <script src="Sources/2Pages/gameSections.js"></script>
+
     <script>
         const serversGrid = document.getElementById("serversGrid");
-        let serversOnline = false;
         let servers = [];
-        function updateServerList() {
-            for (let i = 0; i < servers.length; i++) {
-                serversGrid.innerHTML += `
-                <button class="game-btn" style="border-color: lime;">
-                    <div class="game-name" style="font-size: 1.2em;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
-                            <span style="text-align: left; padding-left: 15px; color: gray;">SERVER IP:</span>
-                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].serverip}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
-                            <span style="text-align: left; padding-left: 15px; color: gray;">PLAYERS:</span>
-                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].players}/10</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 5px 0;">
-                            <span style="text-align: left; padding-left: 15px; color: gray;">REGION:</span>
-                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000;">${servers[i].region}</span>
-                        </div>
-                    </div>
-                </button>`;
-            }
-        }
+
         function addServer(_serverip, _players, _region) {
             servers.push({serverip: _serverip, players: _players, region: _region});
         }
-        async function uploadServer(ip, players, region) {
-            const url = 'https://gorillahub1.firebaseio.com/server/servers.json';
-            const newServer = {
-                serverip: ip,
-                players: players,
-                region: region
-            };
+
+        function updateServerList() {
+            serversGrid.innerHTML = "";
+            servers.forEach(server => {
+                serversGrid.innerHTML += `
+                <button class="game-btn" style="border-color: lime; margin-bottom: 10px; cursor: default;">
+                    <div class="game-name" style="font-size: 1.2em;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 10px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray; font-size: 0.6em;">SERVER IP:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000; font-size: 0.6em;">${server.serverip}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #222; padding: 10px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray; font-size: 0.6em;">PLAYERS:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000; font-size: 0.6em;">${server.players}/10</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; padding: 10px 0;">
+                            <span style="text-align: left; padding-left: 15px; color: gray; font-size: 0.6em;">REGION:</span>
+                            <span style="text-align: right; padding-right: 15px; color: #ff0000; text-shadow: 0 0 10px #ff0000; font-size: 0.6em;">${server.region}</span>
+                        </div>
+                    </div>
+                </button>`;
+            });
+        }
+
+        async function pushServerToDatabase(ip, players, region) {
+            const url = 'https://gorillahub1-default-rtdb.firebaseio.com/servers.json';
+            const newServer = { serverip: ip, players: players, region: region };
             try {
-                const response = await fetch(url, {
+                await fetch(url, {
                     method: 'POST',
                     body: JSON.stringify(newServer),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                if (response.ok) {
-                    console.log("Server uploaded successfully");
-                }
             } catch (error) {
                 console.error("Upload failed:", error);
             }
-            addServer(ip, players, region);
         }
-        uploadServer("1.213.12.31", 5, "US East");
     </script>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         const firebaseConfig = {
             apiKey: "AIzaSyByhL4UGGUrrNOne38Dm0WyP4nEJ6aseew",
             authDomain: "gorillahub1.firebaseapp.com",
@@ -224,10 +212,10 @@
         };
         window.firebaseReady = new Promise((resolve) => {
             const app = initializeApp(firebaseConfig);
-            const analytics = getAnalytics(app);
             resolve(app);
         });
     </script>
+
     <script>
         const loaderFrame = document.getElementById('loader');
 
@@ -241,38 +229,31 @@
         async function startRealLoad() {
             await new Promise(r => setTimeout(r, 500));
             updateLoader(10, "Initializing Core...");
+
             try {
                 if (window.firebaseReady) {
                     await window.firebaseReady;
-                    await new Promise(r => setTimeout(r, 500));
-                    serversOnline = true;
+                    updateLoader(15, "Connecting to Cloud...");
+                    
+                    const response = await fetch('https://gorillahub1-default-rtdb.firebaseio.com/servers.json');
+                    const data = await response.json();
+                    
+                    if (data) {
+                        const serverEntries = Object.values(data);
+                        for (let i = 0; i < serverEntries.length; i++) {
+                            const s = serverEntries[i];
+                            updateLoader(15, `Syncing Server: ${s.region}`);
+                            addServer(s.serverip, s.players, s.region);
+                            updateServerList();
+                            await new Promise(r => setTimeout(r, 100));
+                        }
+                    }
                 }
             } catch (e) {
                 updateLoader(10, "Connection Error: Local Mode");
                 await new Promise(r => setTimeout(r, 1000));
-                serversOnline = false;
             }
-            if (window.firebaseReady) {
-                updateLoader(15, "Connecting to Cloud...");
-                try {
-                    const response = await fetch('https://gorillahub1-default-rtdb.firebaseio.com/servers.json');
-                    const data = await response.json();
-            
-                    if (data) {
-                        const servers = Object.values(data);
-                        for (let i = 0; i < servers.length; i++) {
-                            const s = servers[i];
-                            updateLoader(15, `Syncing Server: ${s.region}`);
-                            addServer(s.serverip, s.players, s.region);
-                            updateServerList();
-                            await new Promise(r => setTimeout(r, 150));
-                        }
-                    }
-                } catch (error) {
-                    updateLoader(15, "Database Error: Using Cache");
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-            }
+
             updateLoader(30, "Loading Neural Fonts...");
             await document.fonts.ready;
             
@@ -284,11 +265,12 @@
                     });
                 });
             }
+
             for (let i = 0; i < allGames.length; i++) {
                 let compileProgress = Math.floor(30 + ((i / allGames.length) * 20));
-                updateLoader(compileProgress, `Compiling: ${i + 1}/${allGames.length}`);
+                updateLoader(compileProgress, `Compiling: ${allGames[i]}`);
                 if (i === allGames.length - 1) generateSections();
-                await new Promise(r => setTimeout(r, 15));
+                await new Promise(r => setTimeout(r, 30));
             }
 
             const images = ['Sources/3Images/background.jpg'];
@@ -299,9 +281,9 @@
                     });
                 });
             }
+
             for (let i = 0; i < images.length; i++) {
                 const src = images[i];
-                const fileName = src.split('/').pop(); 
                 let progress = Math.floor(50 + ((i / images.length) * 45));
                 updateLoader(progress, `Preloading: ${i + 1}/${images.length}`);
                 await new Promise(res => {
@@ -310,17 +292,20 @@
                     img.onload = res;
                     img.onerror = res;
                 });
-                await new Promise(r => setTimeout(r, 15));
+                await new Promise(r => setTimeout(r, 20));
             }
+
             updateLoader(100, "Loading Finished");
             setTimeout(() => {
                 document.getElementById("loader").style.opacity = '0';
-                document.getElementById("loader").style.display = 'none';
-                document.getElementById("panel").style.display = 'block';
-                document.getElementById("backg").style.display = 'block';
-                document.getElementById("search-bar").style.display = 'block';
-                document.title = 'Home - Google Drive';
-            }, 500);
+                setTimeout(() => {
+                    document.getElementById("loader").style.display = 'none';
+                    document.getElementById("panel").style.display = 'block';
+                    document.getElementById("backg").style.display = 'block';
+                    document.getElementById("search-bar").style.display = 'block';
+                    document.title = 'Home - Google Drive';
+                }, 500);
+            }, 800);
         }
 
         window.onload = function () {
@@ -339,7 +324,6 @@
                 if (tabId === 'servers') {
                     bg.style.backgroundImage = "url('Sources/3Images/background.jpg')";
                     bg.style.backgroundSize = "cover";
-                    bg.style.position = "fixed";
                     bg.style.animation = "none";
                 } else {
                     bg.style.backgroundImage = "radial-gradient(circle, rgba(255,0,0,0.15) 20%, transparent 10%)";
